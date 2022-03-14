@@ -5,13 +5,19 @@ find_package(fmt CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(Vulkan REQUIRED)
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.23")
+    message(STATUS "Found Vulkan version ${Vulkan_VERSION}")
+endif()
 
 set(vulkan_engine_SOURCES
-    src/window.cpp
+    # src/window.cpp
+    src/engine.cpp
 )
 
 set(vulkan_engine_HEADERS
-    src/window.hpp
+    # src/window.hpp
 )
 
 # Header files are explicitely added to the target so that they show up in IDEs
@@ -29,6 +35,7 @@ target_link_libraries(vulkan_engine
     PRIVATE glfw
     PRIVATE glm::glm
     PRIVATE spdlog::spdlog
+    PRIVATE Vulkan::Vulkan
 )
 
 set(vulkan_engine_DBGFLAGS
@@ -54,7 +61,7 @@ set(vulkan_engine_DBGFLAGS
         -Wuseless-cast
         -Wdouble-promotion
         -Wformat=2
-        -Wlifetime
+        # -Wlifetime
     >
     $<$<CXX_COMPILER_ID:MSVC>:
         /permissive-
@@ -81,8 +88,28 @@ set(vulkan_engine_DBGFLAGS
     >
 )
 
+if(VKE_ASAN)
+    set(vulkna_engine_ASANFLAGS
+        $<$<CXX_COMPILER_ID:Clang,GNU>:
+            -fsanitize=address
+            -fsanitize=pointer-compare
+            -fsanitize=pointer-subtract
+            -fsanitize=leak
+            -fsanitize=undefined
+            -fsanitize-address-use-after-scope
+        >
+    )
+
+    target_compile_options(vulkan_engine PUBLIC ${vulkna_engine_ASANFLAGS})
+    target_link_options(vulkan_engine PUBLIC ${vulkna_engine_ASANFLAGS})
+endif()
+
 target_compile_options(vulkan_engine
     PRIVATE $<$<CONFIG:Debug>:${vulkan_engine_DBGFLAGS}>
 )
 
 set_target_properties(vulkan_engine PROPERTIES CXX_STANDARD 20)
+
+if(VKE_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
