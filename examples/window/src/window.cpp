@@ -1,7 +1,6 @@
 #include "GLFW/glfw3.h"
 
 #include <cstdlib>
-#include <memory>
 
 // This example leaks 1688B of memory on Ubuntu 18.04 as per Asan. 
 // According to https://github.com/glfw/glfw/issues/1195 this is due to libX11
