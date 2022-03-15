@@ -2,7 +2,7 @@
 
 #include <string>
 
-struct GLFWwindow {};
+struct GLFWwindow;
 
 namespace nkgt {
 
