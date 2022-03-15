@@ -27,6 +27,13 @@ Engine::Engine(std::string name, int width, int height)
         nullptr, 
         nullptr
     );
+
+    vk::ApplicationInfo app_info(
+        window_.name.c_str(), 
+        VK_MAKE_VERSION(0, 0, 1),
+        "VulkanToy",
+        VK_MAKE_VERSION(0, 0, 1)
+        VK_API_VERSIO)
 }
 
 Engine::~Engine() {

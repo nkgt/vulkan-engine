@@ -1,5 +1,10 @@
 #pragma once
 
+#ifndef VULKAN_HPP_NO_EXCEPTIONS
+#define VULKAN_HPP_NO_EXCEPTIONS
+#endif
+#include "vulkan/vulkan.hpp"
+
 #include <string>
 
 struct GLFWwindow;
@@ -22,6 +27,8 @@ private:
     };
 
     WindowInfo window_;
+    
+    vk::Instance instance_;
 };
 
 } // namespace nkgt
