@@ -2,6 +2,7 @@
 
 #include "GLFW/glfw3.h"
 #include "spdlog/spdlog.h"
+#include <cstdint>
 
 namespace nkgt {
 
@@ -32,11 +33,57 @@ Engine::Engine(std::string name, int width, int height)
         window_.name.c_str(), 
         VK_MAKE_VERSION(0, 0, 1),
         "VulkanToy",
-        VK_MAKE_VERSION(0, 0, 1)
-        VK_API_VERSIO)
+        VK_MAKE_VERSION(0, 0, 1),
+        VK_API_VERSION_1_3
+    );
+
+    uint32_t glfw_extension_count;
+    const char* const* glfw_extensions = glfwGetRequiredInstanceExtensions(
+        &glfw_extension_count
+    );
+
+    std::vector<const char*> requested_extensions(
+        glfw_extensions,
+        glfw_extensions + glfw_extension_count
+    );
+#ifndef NDEBUG
+    requested_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+#endif
+
+#ifdef NDEBUG
+    std::vector<const char*> requested_layers = {};
+#else
+    std::vector<const char*> requested_layers = {
+        "VK_LAYER_KHRONOS_validation"
+    };
+#endif
+
+    vk::InstanceCreateInfo create_info(
+        {}, 
+        &app_info, 
+        static_cast<uint32_t>(requested_layers.size()), 
+        requested_layers.data(), 
+        static_cast<uint32_t>(requested_extensions.size()), 
+        requested_extensions.data()
+    );
+
+    auto [result, instance] = vk::createInstance(create_info);
+
+    switch (result) {
+    case vk::Result::eSuccess:
+        instance_ = instance;
+        break;
+    default:
+        spdlog::error(
+            "Unable to create a Vulkan Instance - Error: {}", 
+            vk::to_string(result)
+        );
+        break;
+    }
 }
 
 Engine::~Engine() {
+    instance_.destroy();
     glfwTerminate();
 }
 
