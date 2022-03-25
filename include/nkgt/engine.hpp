@@ -1,8 +1,7 @@
 #pragma once
 
-#ifndef VULKAN_HPP_NO_EXCEPTIONS
 #define VULKAN_HPP_NO_EXCEPTIONS
-#endif
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #include "vulkan/vulkan.hpp"
 
 #include <string>
@@ -29,6 +28,10 @@ private:
     WindowInfo window_;
     
     vk::Instance instance_;
+#ifndef NDEBUG
+    vk::DebugUtilsMessengerEXT debug_messenger_;
+#endif
+    vk::PhysicalDevice physical_device_;
 };
 
 } // namespace nkgt
