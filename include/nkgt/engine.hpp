@@ -41,6 +41,9 @@ private:
 
     vk::PhysicalDevice physical_device_;
     QueueFamilies queue_families_;
+
+    vk::Device device_;
+    vk::Queue graphic_queue_;
 };
 
 } // namespace nkgt

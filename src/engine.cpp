@@ -164,6 +164,33 @@ get_queue_families(const vk::PhysicalDevice& physical_device) noexcept {
     return families;
 }
 
+[[nodiscard]] static vk::Device
+create_device(const vk::PhysicalDevice& physical_device, 
+              const QueueFamilies& queue_families) noexcept {
+    float priority = 1.0f;
+    vk::DeviceQueueCreateInfo queue_info(
+        {}, 
+        queue_families.graphic_family.value(), 
+        1, 
+        &priority
+    );
+
+    vk::DeviceCreateInfo create_info({}, queue_info);
+
+    auto [result, device] = physical_device.createDevice(create_info);
+
+    if (result == vk::Result::eSuccess) {
+        return device;
+    } else {
+        spdlog::error(
+            "Unable to enumerate physical devices - Error: {}",
+            vk::to_string(result)
+        );
+
+        return {};
+    }
+}
+
 Engine::Engine(std::string name, int width, int height)
     : window_{ .name = std::move(name),
                .width = width,
@@ -196,9 +223,15 @@ Engine::Engine(std::string name, int width, int height)
 
     physical_device_ = create_physical_device(instance_);
     queue_families_ = get_queue_families(physical_device_);
+
+    device_ = create_device(physical_device_, queue_families_);
+    VULKAN_HPP_DEFAULT_DISPATCHER.init(device_);
+    graphic_queue_ = device_.getQueue(queue_families_.graphic_family.value(), 0);
 }
 
 Engine::~Engine() {
+    device_.destroy();
+
 #ifndef NDEBUG
     instance_.destroyDebugUtilsMessengerEXT(debug_messenger_, nullptr);
 #endif
