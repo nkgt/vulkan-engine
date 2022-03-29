@@ -13,6 +13,7 @@ namespace nkgt {
 
 struct QueueFamilies {
     std::optional<uint32_t> graphic_family;
+    std::optional<uint32_t> present_family;
 
     [[nodiscard]] bool is_complete() const noexcept;
 };
@@ -44,6 +45,9 @@ private:
 
     vk::Device device_;
     vk::Queue graphic_queue_;
+    vk::Queue present_queue_;
+
+    vk::SurfaceKHR surface_;
 };
 
 } // namespace nkgt
