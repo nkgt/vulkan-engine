@@ -13,3 +13,5 @@ endif()
 target_compile_options(triangle
     PRIVATE $<$<CONFIG:Debug>:${vulkan_engine_DBGFLAGS}>
 )
+
+set_target_properties(triangle PROPERTIES CXX_STANDARD 20)

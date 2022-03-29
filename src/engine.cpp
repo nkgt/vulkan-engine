@@ -6,6 +6,10 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 
 namespace nkgt {
 
+[[nodiscard]] bool QueueFamilies::is_complete() const noexcept {
+    return graphic_family.has_value();
+}
+
 #ifndef NDEBUG
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -142,6 +146,24 @@ create_physical_device(const vk::Instance& instance) noexcept {
     }
 }
 
+[[nodiscard]] static QueueFamilies
+get_queue_families(const vk::PhysicalDevice& physical_device) noexcept {
+    auto available_families = physical_device.getQueueFamilyProperties();
+    QueueFamilies families;
+
+    for (std::size_t i = 0; i < available_families.size(); ++i) {
+        if (available_families[i].queueFlags & vk::QueueFlagBits::eGraphics) {
+            families.graphic_family = i;
+        }
+
+        if (families.is_complete()) {
+            break;
+        }
+    }
+
+    return families;
+}
+
 Engine::Engine(std::string name, int width, int height)
     : window_{ .name = std::move(name),
                .width = width,
@@ -173,6 +195,7 @@ Engine::Engine(std::string name, int width, int height)
 #endif
 
     physical_device_ = create_physical_device(instance_);
+    queue_families_ = get_queue_families(physical_device_);
 }
 
 Engine::~Engine() {
