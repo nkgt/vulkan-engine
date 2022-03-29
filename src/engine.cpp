@@ -11,6 +11,45 @@ namespace nkgt {
            present_family.has_value();
 }
 
+SwapChainDetails::SwapChainDetails(const vk::PhysicalDevice& physical_device,
+                                   const vk::SurfaceKHR& surface) {
+    auto [capabilities_result, temp_capabilities] =
+        physical_device.getSurfaceCapabilitiesKHR(surface);
+
+    if (capabilities_result == vk::Result::eSuccess) {
+        capabilities = temp_capabilities;
+    } else {
+        spdlog::error(
+            "Unable to retrieve surface capabilities - Error {}",
+            vk::to_string(capabilities_result)
+        );
+    }
+
+    auto [formats_result, temp_formats] =
+        physical_device.getSurfaceFormatsKHR(surface);
+
+    if (formats_result == vk::Result::eSuccess) {
+        formats = temp_formats;
+    } else {
+        spdlog::error(
+            "Unable to retrieve surface formats - Error {}",
+            vk::to_string(formats_result)
+        );
+    }
+
+    auto [modes_results, temp_modes] =
+        physical_device.getSurfacePresentModesKHR(surface);
+
+    if (modes_results == vk::Result::eSuccess) {
+        present_modes = temp_modes;
+    } else {
+        spdlog::error(
+            "Unable to retrieve surface presentations modes - Error {}",
+            vk::to_string(modes_results)
+        );
+    }
+}
+
 #ifndef NDEBUG
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -200,7 +239,16 @@ create_device(const vk::PhysicalDevice& physical_device,
         queue_infos.push_back(present_queue_info);
     }
 
-    auto [result, device] = physical_device.createDevice({ {}, queue_infos });
+    std::vector<const char*> required_extensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+
+    auto [result, device] = physical_device.createDevice({ 
+        {},
+        queue_infos,
+        {},
+        required_extensions
+    });
 
     if (result == vk::Result::eSuccess) {
         return device;

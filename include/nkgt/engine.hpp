@@ -18,6 +18,15 @@ struct QueueFamilies {
     [[nodiscard]] bool is_complete() const noexcept;
 };
 
+struct SwapChainDetails {
+    vk::SurfaceCapabilitiesKHR capabilities;
+    std::vector<vk::SurfaceFormatKHR> formats;
+    std::vector<vk::PresentModeKHR> present_modes;
+
+    SwapChainDetails(const vk::PhysicalDevice& physical_device,
+                     const vk::SurfaceKHR& surface);
+};
+
 class Engine {
 public:
     Engine(std::string window_name, int width, int height);
