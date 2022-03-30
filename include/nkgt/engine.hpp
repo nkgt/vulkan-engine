@@ -6,6 +6,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 
 struct GLFWwindow;
 
@@ -16,6 +17,7 @@ struct QueueFamilies {
     std::optional<uint32_t> present_family;
 
     [[nodiscard]] bool is_complete() const noexcept;
+    [[nodiscard]] std::vector<uint32_t> unique_indices() const noexcept;
 };
 
 class Engine {
@@ -48,6 +50,8 @@ private:
     vk::Queue present_queue_;
 
     vk::SurfaceKHR surface_;
+    vk::SwapchainKHR swapchain_;
+    std::vector<vk::Image> swapchain_images_;
 };
 
 } // namespace nkgt

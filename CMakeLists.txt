@@ -12,12 +12,12 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.23")
 endif()
 
 set(vulkan_engine_SOURCES
-    # src/window.cpp
+    src/swapchain_utils.cpp
     src/engine.cpp
 )
 
 set(vulkan_engine_HEADERS
-    # src/window.hpp
+    include/nkgt/swapchain_utils.hpp
 )
 
 # Header files are explicitely added to the target so that they show up in IDEs
