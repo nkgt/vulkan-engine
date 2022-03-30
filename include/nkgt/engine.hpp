@@ -55,7 +55,7 @@ private:
     SwapChainDetails swapchain_details_;
     vk::SwapchainKHR swapchain_;
     std::vector<vk::Image> swapchain_images_;
-    std::vector<vk::ImageView> swapchain_image_views;
+    std::vector<vk::ImageView> swapchain_image_views_;
 };
 
 } // namespace nkgt

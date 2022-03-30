@@ -271,6 +271,39 @@ create_swapchain(const vk::Device& device,
         return {};
     }
 }
+
+[[nodiscard]] static std::vector<vk::ImageView>
+create_swapchain_image_views(const vk::Device& device,
+                             const std::vector<vk::Image>& images,
+                             const vk::Format& format) noexcept {
+    std::vector<vk::ImageView> views;
+    views.reserve(images.size());
+
+    vk::ImageViewCreateInfo create_info(
+        {},
+        {},
+        vk::ImageViewType::e2D,
+        format,
+        vk::ComponentMapping(),
+        vk::ImageSubresourceRange(vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1)
+    );
+
+    for (const auto& image : images) {
+        create_info.setImage(image);
+        auto [result, view] = device.createImageView(create_info);
+
+        if (result == vk::Result::eSuccess) {
+            views.push_back(view);
+        } else {
+            spdlog::error(
+                "Unable to create image view - Error: {}",
+                vk::to_string(result)
+            );
+        }
+    }
+
+    return views;
+}
  
 Engine::Engine(std::string name, int width, int height)
     : window_{ .name = std::move(name),
@@ -360,9 +393,20 @@ Engine::Engine(std::string name, int width, int height)
             vk::to_string(result)
         );
     }
+
+    swapchain_image_views_ = create_swapchain_image_views(
+        device_,
+        swapchain_images_,
+        swapchain_details_.format.format
+    );
+    spdlog::info("Create Vulkan swapchain image views");
 }
 
 Engine::~Engine() {
+    for (const auto& view : swapchain_image_views_) {
+        device_.destroyImageView(view);
+    }
+
     device_.destroySwapchainKHR(swapchain_);
     device_.destroy();
 
