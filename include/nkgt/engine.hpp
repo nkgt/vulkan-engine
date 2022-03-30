@@ -1,4 +1,5 @@
 #pragma once
+#include "nkgt/swapchain_utils.hpp"
 
 #define VULKAN_HPP_NO_EXCEPTIONS 1
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
@@ -50,8 +51,11 @@ private:
     vk::Queue present_queue_;
 
     vk::SurfaceKHR surface_;
+
+    SwapChainDetails swapchain_details_;
     vk::SwapchainKHR swapchain_;
     std::vector<vk::Image> swapchain_images_;
+    std::vector<vk::ImageView> swapchain_image_views;
 };
 
 } // namespace nkgt

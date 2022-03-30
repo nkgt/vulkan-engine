@@ -224,19 +224,14 @@ create_device(const vk::PhysicalDevice& physical_device,
 }
 
 [[nodiscard]] static vk::SwapchainKHR
-create_swapchain(const vk::PhysicalDevice& physical_device,
-                 const vk::Device& device,
+create_swapchain(const vk::Device& device,
                  const vk::SurfaceKHR& surface,
-                 const QueueFamilies& queue_families,
-                 GLFWwindow* window) {
-    auto swapchain_details = SwapChainDetails(physical_device, surface);
-
-    auto format = swapchain_details.best_format();
-    auto image_count_limits = swapchain_details.image_count();
-
-    uint32_t image_count = image_count_limits.first + 1;
-    if (image_count_limits.second > 0 && image_count > image_count_limits.second) {
-        image_count = image_count_limits.second;
+                 const SwapChainDetails& swapchain_details,
+                 const QueueFamilies& queue_families) {
+    uint32_t image_count = swapchain_details.capabilities.minImageCount + 1;
+    if (swapchain_details.capabilities.maxImageCount > 0 &&
+        image_count > swapchain_details.capabilities.maxImageCount) {
+        image_count = swapchain_details.capabilities.maxImageCount;
     }
 
     auto indices = queue_families.unique_indices();
@@ -250,16 +245,16 @@ create_swapchain(const vk::PhysicalDevice& physical_device,
         {},
         surface,
         image_count,
-        format.format,
-        format.colorSpace,
-        swapchain_details.extent(window),
+        swapchain_details.format.format,
+        swapchain_details.format.colorSpace,
+        swapchain_details.extent,
         1,
         vk::ImageUsageFlagBits::eColorAttachment,
         sharing_mode,
         indices,
         vk::SurfaceTransformFlagBitsKHR::eIdentity,
         vk::CompositeAlphaFlagBitsKHR::eOpaque,
-        swapchain_details.best_present_mode(),
+        swapchain_details.present_mode,
         true
     );
 
@@ -340,12 +335,18 @@ Engine::Engine(std::string name, int width, int height)
     present_queue_ = device_.getQueue(*queue_families_.present_family, 0);
     spdlog::info("Obtained Vulkan queue handles");
 
-    swapchain_ = create_swapchain(
+    swapchain_details_ = SwapChainDetails(
         physical_device_, 
-        device_, 
         surface_, 
-        queue_families_, 
         window_.handle
+    );
+    spdlog::info("Queried Vulkan swapchain details");
+
+    swapchain_ = create_swapchain(
+        device_,
+        surface_,
+        swapchain_details_,
+        queue_families_
     );
     spdlog::info("Created Vulkan swapchain");
 

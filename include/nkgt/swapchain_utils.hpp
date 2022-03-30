@@ -10,15 +10,15 @@ namespace nkgt {
 
 struct SwapChainDetails {
     vk::SurfaceCapabilitiesKHR capabilities;
-    std::vector<vk::SurfaceFormatKHR> formats;
-    std::vector<vk::PresentModeKHR> present_modes;
+    vk::SurfaceFormatKHR format;
+    vk::PresentModeKHR present_mode;
+    vk::Extent2D extent;
 
+    SwapChainDetails() = default;
     SwapChainDetails(const vk::PhysicalDevice& physical_device,
-                     const vk::SurfaceKHR& surface);
+                     const vk::SurfaceKHR& surface,
+                     GLFWwindow* window);
 
-    [[nodiscard]] vk::PresentModeKHR best_present_mode() const noexcept;
-    [[nodiscard]] vk::SurfaceFormatKHR best_format() const noexcept;
-    [[nodiscard]] vk::Extent2D extent(GLFWwindow* window) const noexcept;
     [[nodiscard]] std::pair<uint32_t, uint32_t> image_count() const noexcept;
 };
 
