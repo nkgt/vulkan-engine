@@ -1,6 +1,6 @@
 #pragma once
 
-#define VULKAN_HPP_NO_EXCEPTIONS
+#define VULKAN_HPP_NO_EXCEPTIONS 1
 #define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 #include "vulkan/vulkan.hpp"
 
@@ -16,15 +16,6 @@ struct QueueFamilies {
     std::optional<uint32_t> present_family;
 
     [[nodiscard]] bool is_complete() const noexcept;
-};
-
-struct SwapChainDetails {
-    vk::SurfaceCapabilitiesKHR capabilities;
-    std::vector<vk::SurfaceFormatKHR> formats;
-    std::vector<vk::PresentModeKHR> present_modes;
-
-    SwapChainDetails(const vk::PhysicalDevice& physical_device,
-                     const vk::SurfaceKHR& surface);
 };
 
 class Engine {
