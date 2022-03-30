@@ -18,8 +18,6 @@ struct SwapChainDetails {
     SwapChainDetails(const vk::PhysicalDevice& physical_device,
                      const vk::SurfaceKHR& surface,
                      GLFWwindow* window);
-
-    [[nodiscard]] std::pair<uint32_t, uint32_t> image_count() const noexcept;
 };
 
 } // namespace nkgt

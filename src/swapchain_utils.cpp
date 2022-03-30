@@ -105,9 +105,4 @@ SwapChainDetails::SwapChainDetails(const vk::PhysicalDevice& physical_device,
     }
 }
 
-[[nodiscard]] std::pair<uint32_t, uint32_t>
-SwapChainDetails::image_count() const noexcept {
-    return { capabilities.minImageCount, capabilities.maxImageCount };
-}
-
 } // namespace nkgt
