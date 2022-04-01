@@ -7,10 +7,6 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 
-if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.23")
-    message(STATUS "Found Vulkan version ${Vulkan_VERSION}")
-endif()
-
 set(vulkan_engine_SOURCES
     src/swapchain_utils.cpp
     src/engine.cpp

@@ -1,28 +1,24 @@
 find_package(Vulkan REQUIRED COMPONENTS glslc)
 message(STATUS "Found glslc: ${Vulkan_GLSLC_EXECUTABLE}")
 
-function(compile_shaders target)
-    cmake_parse_arguments(PARSER_ARGV 1 arg "" "" "SOURCES")
-
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/shaders)
-
-    message(STATUS ${arg_SOURCES})
-    message(STATUS ${arg_UNPARSED_ARGUMENTS})
-    message(STATUS ${arg_KEYWORDS_MISSING_VALUES})
+function(compile_shaders)
+    cmake_parse_arguments(arg "" "TARGET" "SOURCES" ${ARGN})
 
     foreach(source ${arg_SOURCES})
-        message(STATUS "Shader: ${source}")
         add_custom_command(
-            OUTPUT  ${source}.bin
-            DEPENDS ${source}
-            DEPFILE ${source}.d
-            COMMAND ${Vulkan_GLSLC_EXECUTABLE}
-                    --target-env=vulkan1.3 -MD -MF ${source}.d
-                    -o ${PROJECT_BINARY_DIR}/shaders/${source}.bin
-                    ${source}
+            OUTPUT  ${PROJECT_BINARY_DIR}/${source}.bin
+            MAIN_DEPENDENCY ${PROJECT_SOURCE_DIR}/${source}
+            DEPFILE ${PROJECT_BINARY_DIR}/${source}.d
+            COMMAND ${Vulkan_GLSLC_EXECUTABLE} 
+                    --target-env=vulkan1.3 -MD -MF ${PROJECT_BINARY_DIR}/${source}.d 
+                    -o ${PROJECT_BINARY_DIR}/${source}.bin
+                    ${PROJECT_SOURCE_DIR}/${source}
         )
-        # Why?
-        target_sources(${target} PRIVATE ${PROJECT_BINARY_DIR}/shaders/${source}.bin)
+
+        list(APPEND OUTPUTS ${source}.bin)
     endforeach()
+
+    add_custom_target(${arg_TARGET}_shaders DEPENDS ${OUTPUTS})
+    add_dependencies(${arg_TARGET} ${arg_TARGET}_shaders)
     
 endfunction()

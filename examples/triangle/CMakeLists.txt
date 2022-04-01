@@ -17,4 +17,4 @@ target_compile_options(triangle
 set_target_properties(triangle PROPERTIES CXX_STANDARD 20)
 
 include(${CMAKE_SOURCE_DIR}/cmake/compile_shaders.cmake)
-compile_shaders(triangle SOURCES shaders/triangle.vert shaders/triangle.frag)
+compile_shaders(TARGET triangle SOURCES shaders/triangle.vert shaders/triangle.frag)
