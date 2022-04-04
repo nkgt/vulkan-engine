@@ -7,6 +7,8 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(Vulkan REQUIRED)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 set(vulkan_engine_SOURCES
     src/swapchain_utils.cpp
     src/engine.cpp
@@ -50,14 +52,18 @@ set(vulkan_engine_DBGFLAGS
         -Wconversion
         -Wsign-conversion
         -Wmisleading-indentation
+        -Wnull-dereference
+        -Wdouble-promotion
+        -Wformat=2
+    >
+    $<$<CXX_COMPILER_ID:GNU>:
         -Wduplicated-cond
         -Wduplicated-branches
         -Wlogical-op
-        -Wnull-dereference
         -Wuseless-cast
-        -Wdouble-promotion
-        -Wformat=2
-        # -Wlifetime
+    >
+    $<$<CXX_COMPILER_ID:Clang>:
+        -Wbool-operation
     >
     $<$<CXX_COMPILER_ID:MSVC>:
         /permissive-
@@ -102,6 +108,7 @@ endif()
 
 target_compile_options(vulkan_engine
     PRIVATE $<$<CONFIG:Debug>:${vulkan_engine_DBGFLAGS}>
+    PUBLIC $<$<CONFIG:Release>:-flto>
 )
 
 set_target_properties(vulkan_engine PROPERTIES CXX_STANDARD 20)
